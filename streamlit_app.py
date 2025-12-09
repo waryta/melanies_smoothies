@@ -1,5 +1,8 @@
 # Import python packages
 import streamlit as st
+import requests
+smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
+st.text(smoothiefroot_response)
 #from snowflake.snowpark.context import get_active_session
 
 # Write directly to the app
