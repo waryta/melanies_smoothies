@@ -2,26 +2,42 @@
 import streamlit as st
 import requests
 smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
-st.text(smoothiefroot_response)
-#from snowflake.snowpark.context import get_active_session
+from snowflake.snowpark.context import get_active_session
+from snowflake.snowpark.functions import col
+
+
 
 # Write directly to the app
-st.title(":apple: Uncle Yer's Fruits Details :apple:")
+st.title(":cup_with_straw: Customize Your Smothies:cup_with_straw:")
 st.write(
-  """Enter fruit name and root depth code below.
+  """Choose the fruits you want in your custum Smothies.
   """
 )
+name_on_order = st.text_input('Name on Smoothies')
+st.write('The name of your smoothie will be:',name_on_order)
 
-# Get the current credentials
-cnx = st.connection("snowflake")
-session = cnx.session()
+session = get_active_session()
+my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'))
+#st.dataframe(data=my_dataframe, use_container_width=True)
 
-fn = st.text_input('Fruit Name:')
-rdc = st.selectbox('Root_Deph:',('S','M','D'))
-if st.button('Submit'):
-    #st.write('Fruit Name entered is ' + fn)
-    #st.write('Root Depth Code chosen is ' + rdc)
-    sql_insert = 'insert into garden_plants.fruits.fruit_details select \''+fn+'\',\''+rdc+'\''
-    #st.write(sql_insert)
-    result=session.sql(sql_insert)
-    st.write(result)
+ingredients_list = st.multiselect(
+    "Choose up to 5 ingredients:",
+    my_dataframe
+)
+
+if ingredients_list:
+    ingredients_string =''
+    for fruit_chosen in ingredients_list:
+        ingredients_string+=fruit_chosen+ ' '
+
+    my_insert_stmt = """ insert into SMOOTHIES.PUBLIC.ORDERS_bis(ingredients,name_on_order)
+            values ('""" + ingredients_string + """','"""+name_on_order+"""')"""
+    time_to_insert=st.button('Submit Order')
+    st.write(my_insert_stmt)
+    #st.stop
+    if time_to_insert:
+        session.sql(my_insert_stmt).collect()
+        st.success('Your Smoothie is ordered!', icon="✅")
+
+
+
