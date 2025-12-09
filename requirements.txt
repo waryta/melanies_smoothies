@@ -1,1 +1,4 @@
-i realu dont know where this file is store in snowflake
+#i realu dont know where this file is store in snowflake
+#requirements.txt
+snowflake-snowpark-python
+streamlit
