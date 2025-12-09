@@ -1,6 +1,7 @@
 # Import python packages
 import streamlit as st
 import requests
+streamlit.title('my parents New Healty Diner')
 smoothiefroot_response = requests.get("https://my.smoothiefroot.com/api/fruit/watermelon")
 from snowflake.snowpark.context import get_active_session
 from snowflake.snowpark.functions import col
